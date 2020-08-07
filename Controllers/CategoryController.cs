@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using EShopAPI.Data;
 using EShopAPI.Models;
@@ -9,11 +10,12 @@ using Microsoft.EntityFrameworkCore;
 namespace EShopAPI.Controllers
 {
     [ApiController]
-    [Route("categories")]
+    [Route("v1/categories")]
     public class CategoryController: ControllerBase
     {
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Category>>> GetCategories([FromServices] DataContext context)
         {
             var categories = await context.Categories.AsNoTracking().ToListAsync();
@@ -22,6 +24,7 @@ namespace EShopAPI.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Category>>> GetById(int id, [FromServices] DataContext context)
         {
             var categories = await context.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id.Equals(id));
@@ -30,6 +33,7 @@ namespace EShopAPI.Controllers
 
         [HttpPost]
         [Route("")]
+        [Authorize(Roles="employee")]
         public async Task<ActionResult<Category>> Post([FromBody] Category model, [FromServices] DataContext context)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -49,6 +53,7 @@ namespace EShopAPI.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles="employee")]
         public async Task<ActionResult<Category>> Put(int id, [FromBody]Category model, [FromServices] DataContext context)
         {
             if(!id.Equals(model.Id)) NotFound(new { message = "Category not found." });
@@ -72,6 +77,7 @@ namespace EShopAPI.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles="employee")]
         public async Task<ActionResult<Category>> Delete(int id, [FromServices] DataContext context)
         {
             var category = await context.Categories.FirstOrDefaultAsync(x => x.Id.Equals(id));

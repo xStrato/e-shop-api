@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EShopAPI.Data;
 using EShopAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ namespace EShopAPI.Controllers
     {
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Product>>> GetProducts([FromServices] DataContext context)
         {
             var products = await context.Products.Include(x => x.Category).AsNoTracking().ToListAsync();
@@ -24,6 +26,7 @@ namespace EShopAPI.Controllers
 
         [HttpGet]
         [Route("categories/{id:int}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Product>>> GetById(int id, [FromServices] DataContext context)
         {
             var products = await context.Products.Include(x => x.Category).AsNoTracking().Where(x => x.CategoryId.Equals(id)).ToListAsync();
@@ -33,6 +36,7 @@ namespace EShopAPI.Controllers
 
         [HttpPost]
         [Route("")]
+        [Authorize(Roles="employee")]
         public async Task<ActionResult<Product>> Post([FromBody] Product model, [FromServices] DataContext context)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
@@ -52,6 +56,7 @@ namespace EShopAPI.Controllers
 
         [HttpPost]
         [Route("array")]
+        [Authorize(Roles="employee")]
         public async Task<ActionResult<Product[]>> PostProdcts([FromBody] Product[] model, [FromServices] DataContext context)
         {
             if(!ModelState.IsValid) return BadRequest(ModelState);
