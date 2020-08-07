@@ -47,7 +47,7 @@ namespace EShopAPI
                 };
             });
 
-            services.AddDbContext<DataContext>(opt => opt.UseSqlServer("Server=localhost;Database=SHOP;User ID=SA;Password=9p8o7i6u5y$#@"));
+            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(""));
             services.AddScoped<DataContext, DataContext>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
