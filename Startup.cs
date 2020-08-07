@@ -19,7 +19,8 @@ namespace EShopAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("ApiCrudDatabase"));
+            // services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("ApiCrudDatabase"));
+            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(""));
             services.AddScoped<DataContext, DataContext>();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
