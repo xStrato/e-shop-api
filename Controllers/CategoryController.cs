@@ -16,6 +16,8 @@ namespace EShopAPI.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
+        [ResponseCache(VaryByHeader="User-Agent", Location=ResponseCacheLocation.Any, Duration=30)]
+        // [ResponseCache(Location=ResponseCacheLocation.None, Duration=0)] //Caso informação trazida pelo método não possa ficar cacheado, habilitar essa linha 
         public async Task<ActionResult<List<Category>>> GetCategories([FromServices] DataContext context)
         {
             var categories = await context.Categories.AsNoTracking().ToListAsync();

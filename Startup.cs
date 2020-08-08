@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace EShopAPI
 {
@@ -22,14 +23,17 @@ namespace EShopAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
             var key = System.Text.Encoding.ASCII.GetBytes(Settings.Secret);
             // services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("ApiCrudDatabase"));
+
+            services.AddCors();
 
             services.AddResponseCompression(options => {
                 options.Providers.Add<GzipCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json" });
             });
+            // services.AddResponseCaching(); // Cachea toda aplicação de forma geral (informações e headers)
+            services.AddControllers();
 
             services.AddAuthentication(x => {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -47,8 +51,13 @@ namespace EShopAPI
                 };
             });
 
-            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(""));
-            services.AddScoped<DataContext, DataContext>();
+            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+            // services.AddDbContext<DataContext>(opt => opt.UseSqlServer(""));
+            // services.AddScoped<DataContext, DataContext>();
+
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shop API", Version = "v1" });
+            });
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -59,7 +68,13 @@ namespace EShopAPI
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Shop API V1");
+            });
+
             app.UseRouting();
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseAuthorization();
 

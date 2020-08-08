@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EShopAPI.Data;
@@ -25,8 +24,12 @@ namespace EShopAPI.Controllers
 
             try
             {
+                model.Role = "employee";
                 context.Users.Add(model);
                 await context.SaveChangesAsync();
+                
+                model.Password = "";
+
                 return model;
             }
             catch(Exception error)
@@ -50,6 +53,8 @@ namespace EShopAPI.Controllers
                 if(user.Equals(null)) return NotFound(new { message = "Username or Password invalid!" });
                 var token = TokenService.GenerateToken(user);
 
+                user.Password = "";
+
                 return new { user = user, token = token };
             }
             catch(Exception error)
@@ -58,30 +63,30 @@ namespace EShopAPI.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("")]
-        [Authorize(Roles="manager")]
-        public async Task<ActionResult<dynamic>> ListUsers([FromServices] DataContext context, [FromBody] User model)
-        {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
-            return null;
-        }
+        // [HttpPost]
+        // [Route("")]
+        // [Authorize(Roles="manager")]
+        // public async Task<ActionResult<dynamic>> ListUsers([FromServices] DataContext context, [FromBody] User model)
+        // {
+        //     if(!ModelState.IsValid) return BadRequest(ModelState);
+        //     return null;
+        // }
 
         //Restando os metodos PUT para atualizar o usuário e DELETE com [Authorize(Roles="manager")]
 
-        [HttpGet]
-        [Route("auth")]
-        [Authorize]
-        public async Task<ActionResult<string>> Auth() => "You're authorized";
+        // [HttpGet]
+        // [Route("auth")]
+        // [Authorize]
+        // public async Task<ActionResult<string>> Auth() => "You're authorized";
 
-        [HttpGet]
-        [Route("employee")]
-        [Authorize(Roles="employee")]
-        public async Task<ActionResult<string>> AuthEmployee() => "You're an authorized Employee";
+        // [HttpGet]
+        // [Route("employee")]
+        // [Authorize(Roles="employee")]
+        // public async Task<ActionResult<string>> AuthEmployee() => "You're an authorized Employee";
 
-        [HttpGet]
-        [Route("manager")]
-        [Authorize(Roles="manager")]
-        public async Task<ActionResult<string>> AuthManager() => "You're an authorized Manager";
+        // [HttpGet]
+        // [Route("manager")]
+        // [Authorize(Roles="manager")]
+        // public async Task<ActionResult<string>> AuthManager() => "You're an authorized Manager";
     }
 }
